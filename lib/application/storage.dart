@@ -6,7 +6,8 @@ class Storage {
   Future<bool> isHaveToken() async {
     final storage = await SharedPreferences.getInstance();
     final result = storage.get(_key);
-    return result == null ? false : true;
+    if (result == null) storage.clear();
+    return (result == null) || (result == "") ? false : true;
   }
 
   Future<String?> getTokenInStorage() async {
@@ -23,6 +24,7 @@ class Storage {
   Future<void> deleteToken() async {
     final storage = await SharedPreferences.getInstance();
     storage.clear();
+    print("token deleted");
   }
 
   Future<void> saveUser(String _email, String _name) async {

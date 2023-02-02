@@ -1,9 +1,10 @@
 import 'package:brandpoint/application/storage.dart';
+import 'package:brandpoint/constants.dart';
 import 'package:brandpoint/models/user.dart';
-//import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 
 class AutheficationService {
-  //final Dio _dio = Dio();
+  final Dio _dio = Dio(BaseOptions(baseUrl: BackendUrl));
   final Storage _storage = Storage();
 
   Future<User?> registration(String name, String email, String password) async {
@@ -38,7 +39,7 @@ class AutheficationService {
 
     // send token on server and get info about User
     final user = await _storage.getUser();
-    return User(token as String, user['name'], user["email"] as String);
+    return user == null ? null : User(token, user["email"], user["Password"]);
   }
 
   void signOut() {

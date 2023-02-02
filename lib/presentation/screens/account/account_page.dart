@@ -1,5 +1,6 @@
+import 'package:brandpoint/application/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -10,7 +11,9 @@ class AccountPage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           child: Text("Logout"),
-          onPressed: () {},
+          onPressed: () {
+            BlocProvider.of<AuthBloc>(context).add(UserLogOut());
+          },
         ),
       ),
     );
