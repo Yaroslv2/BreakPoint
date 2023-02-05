@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:bloc/bloc.dart';
 import 'package:brandpoint/application/auth/services/authefication_service.dart';
 import 'package:brandpoint/application/storage.dart';
@@ -25,34 +27,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     print("_appLoad");
 
     try {
-      Future.delayed(const Duration(seconds: 4));
       if (await _storage.isHaveToken()) {
-        final user = await _autheficationService.signInWithToken();
-        if (user != null) {
-          emit(AuthAutheficated(user: user as User));
+        final response = await _autheficationService.signInWithToken();
+        if (response != null) {
+          emit(AuthAutheficated());
         } else {
           emit(AuthNotAutheficated());
         }
       } else {
         emit(AuthNotAutheficated());
       }
-    } catch (e) {
-      print("error: $e");
+    } catch (error) {
+      emit(AuthNotAutheficated());
     }
   }
 
   Future _userLogIn(UserLogIn event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
+    print("_userLogIn");
     try {
-      final user = await _autheficationService.signInWithPasswordAndEmail(
+      final response = await _autheficationService.signInWithPasswordAndEmail(
           event.email, event.password);
-      if (user != null) {
-        emit(AuthAutheficated(user: user));
+      if (response.statusCode == 200) {
+        if (response.body["error"] != null) {
+          emit(AuthFailure(message: "${response.body["error"]}"));
+        } else {
+          emit(AuthAutheficated());
+        }
       } else {
-        emit(AuthNotAutheficated());
+        emit(const AuthFailure(message: "Something going wrong"));
       }
-    } catch (e) {
-      print("error: $e");
+    } catch (error) {
+      emit(AuthFailure(message: "$error"));
     }
   }
 
@@ -60,15 +66,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       UserRegistration event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final user = await _autheficationService.registration(
+      final response = await _autheficationService.registration(
           event.name, event.email, event.password);
-      if (user != null) {
-        emit(AuthAutheficated(user: user));
+      if (response.statusCode == 200) {
+        if (response.body["error"] != null) {
+          emit(AuthFailure(message: "${response.body["error"]}"));
+        } else {
+          emit(AuthAutheficated());
+        }
       } else {
-        (AuthNotAutheficated());
+        emit(const AuthFailure(message: "Something going wrong..."));
       }
-    } catch (e) {
-      print("error: $e");
+    } catch (error) {
+      emit(AuthFailure(message: "$error"));
     }
   }
 
@@ -77,8 +87,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       _autheficationService.signOut();
       emit(AuthNotAutheficated());
-    } catch (e) {
-      print("error: $e");
+    } catch (error) {
+      emit(AuthFailure(message: "$error"));
     }
   }
 }

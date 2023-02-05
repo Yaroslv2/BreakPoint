@@ -43,6 +43,7 @@ dependencies:
   dio:
   provider:
   shared_preferences:
+  jwt_decode:
 
 dev_dependencies:
   flutter_test:

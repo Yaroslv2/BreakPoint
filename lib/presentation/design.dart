@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 
 class LoginPageDesign {
   final Logo = Text(
-    "BRANDPOINT",
+    "BREAKPOINT",
     style: GoogleFonts.alfaSlabOne(
-        color: Colors.black, fontWeight: FontWeight.w400, fontSize: 28),
+        color: Colors.black, fontWeight: FontWeight.w400, fontSize: 32),
   );
-  final formFieldStyle =
+  final textStyle =
       GoogleFonts.openSans(color: Colors.black, fontWeight: FontWeight.w400);
+
+  final greyTextStyle =
+      GoogleFonts.openSans(color: Colors.grey, fontWeight: FontWeight.w400);
 }
 
 final textStyleGray =

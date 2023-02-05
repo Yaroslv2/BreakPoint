@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
             child: BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
                 if (state is AuthNotAutheficated) {
-                  return const LoginPage();
+                  return LoginPage(BlocProvider.of<AuthBloc>(context));
                 }
                 if (state is AuthAutheficated) {
                   return const BottomBar();

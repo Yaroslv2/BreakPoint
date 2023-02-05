@@ -1,3 +1,5 @@
+import 'package:brandpoint/models/user.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Storage {
@@ -27,18 +29,12 @@ class Storage {
     print("token deleted");
   }
 
-  Future<void> saveUser(String _email, String _name) async {
+  Future<User> getUser() async {
     final storage = await SharedPreferences.getInstance();
-    storage.setString("email", _email);
-    storage.setString("name", _name);
-  }
+    final token = storage.getString(_key);
 
-  Future<Map<String, String?>> getUser() async {
-    final storage = await SharedPreferences.getInstance();
-    Map<String, String?> result = {
-      "email": storage.getString("email"),
-      "name": storage.getString("name"),
-    };
-    return result;
+    final payload = Jwt.parseJwt(token!);
+
+    return User(payload["name"], payload["mail"]);
   }
 }
