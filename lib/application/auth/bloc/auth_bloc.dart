@@ -1,9 +1,6 @@
-import 'dart:html';
-
 import 'package:bloc/bloc.dart';
 import 'package:brandpoint/application/auth/services/authefication_service.dart';
 import 'package:brandpoint/application/storage.dart';
-import 'package:brandpoint/models/user.dart';
 import 'package:equatable/equatable.dart';
 
 part 'auth_event.dart';
@@ -25,19 +22,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future _appLoad(AppLoad event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     print("_appLoad");
-
     try {
       if (await _storage.isHaveToken()) {
         final response = await _autheficationService.signInWithToken();
-        if (response != null) {
+        if (response) {
+          print("true response");
           emit(AuthAutheficated());
         } else {
+          print("false response");
           emit(AuthNotAutheficated());
         }
       } else {
+        print("Havent token");
         emit(AuthNotAutheficated());
       }
     } catch (error) {
+      print("error");
       emit(AuthNotAutheficated());
     }
   }
@@ -49,13 +49,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final response = await _autheficationService.signInWithPasswordAndEmail(
           event.email, event.password);
       if (response.statusCode == 200) {
-        if (response.body["error"] != null) {
-          emit(AuthFailure(message: "${response.body["error"]}"));
-        } else {
-          emit(AuthAutheficated());
-        }
+        emit(AuthAutheficated());
       } else {
-        emit(const AuthFailure(message: "Something going wrong"));
+        emit(AuthFailure(message: response.error));
       }
     } catch (error) {
       emit(AuthFailure(message: "$error"));

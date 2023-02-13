@@ -1,23 +1,19 @@
 import 'dart:convert';
 
-import 'package:brandpoint/application/auth/services/response.dart';
+import 'package:brandpoint/models/response.dart';
 import 'package:brandpoint/application/storage.dart';
-import 'package:brandpoint/constants.dart';
-import 'package:brandpoint/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
 class AutheficationService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: "http://192.168.0.19:5000",
+    baseUrl: "https://vad.pythonanywhere.com",
     contentType: "application/json",
   ));
   final Storage _storage = Storage();
 
   Future<MyResponse> registration(
       String name, String email, String password) async {
-    await Future.delayed(const Duration(seconds: 4)); // for now
-
     // send to server and get token
     var params = {
       "mail": email,
@@ -54,8 +50,6 @@ class AutheficationService {
 
   Future<MyResponse> signInWithPasswordAndEmail(
       String email, String password) async {
-    await Future.delayed(const Duration(seconds: 2)); // for now
-
     var params = {
       "mail": email,
       "psw": password,
@@ -74,9 +68,10 @@ class AutheficationService {
         ),
         data: json.encode(params),
       );
+      print(response);
       if (response.statusCode == 200) {
         if (response.data["error"] != null) {
-          return MyResponse.withError(response.data, response.statusCode);
+          return MyResponse.withError(response.data["error"], 0);
         } else {
           _storage.putTokenInStorage(response.data["access_token"]);
           return MyResponse(response.data, response.statusCode);
@@ -89,13 +84,12 @@ class AutheficationService {
     }
   }
 
-  Future<MyResponse?> signInWithToken() async {
-    // get token into storage
+  Future<bool> signInWithToken() async {
     final token = await _storage.getTokenInStorage();
-
+    print(token);
     if (token != null) {
-      if (!Jwt.isExpired(token)) {
-        return null;
+      if (Jwt.isExpired(token)) {
+        return false;
       } else {
         var params = {"access_token": token};
         var response;
@@ -111,20 +105,21 @@ class AutheficationService {
             data: json.encode(params),
           );
           if (response.statusCode == 200) {
+            print("Response: $response");
             if (response.data["error"] != null) {
-              return null;
+              return false;
             } else {
-              return MyResponse(response.data, response.statusCode);
+              return true;
             }
           } else {
-            return null;
+            return false;
           }
         } catch (error) {
-          return null;
+          return false;
         }
       }
     } else {
-      return null;
+      return false;
     }
   }
 

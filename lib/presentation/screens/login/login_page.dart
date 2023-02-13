@@ -6,9 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatelessWidget {
-  final AuthBloc bloc;
-
-  const LoginPage(this.bloc, {super.key});
+  const LoginPage({super.key});
 
   @override
   Widget build(context) {
@@ -41,7 +39,8 @@ class LoginPage extends StatelessWidget {
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => RegistrationPage(bloc),
+                              builder: (_) => RegistrationPage(
+                                  BlocProvider.of<AuthBloc>(context)),
                             ));
                           },
                           child: Text(

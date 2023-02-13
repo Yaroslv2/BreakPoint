@@ -15,8 +15,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme:
-            ThemeData(primaryColor: Colors.black, primarySwatch: Colors.grey),
+        theme: ThemeData(
+          primaryColor: Colors.black,
+          primarySwatch: Colors.grey,
+        ),
         home: RepositoryProvider(
           create: (context) => AutheficationService(),
           child: BlocProvider<AuthBloc>(
@@ -25,20 +27,36 @@ class MyApp extends StatelessWidget {
                   RepositoryProvider.of<AutheficationService>(context))
                 ..add(AppLoad());
             },
-            child: BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, state) {
-                if (state is AuthNotAutheficated) {
-                  return LoginPage(BlocProvider.of<AuthBloc>(context));
+            child: BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthFailure) {
+                  print(state.message);
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text("Error occured"),
+                      content: Text(state.message),
+                    ),
+                  );
+                  BlocProvider.of<AuthBloc>(context)
+                      .emit(AuthNotAutheficated());
                 }
-                if (state is AuthAutheficated) {
-                  return const BottomBar();
-                }
-                return const Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
               },
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthNotAutheficated) {
+                    return LoginPage();
+                  }
+                  if (state is AuthAutheficated) {
+                    return const BottomBar();
+                  }
+                  return const Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ));
