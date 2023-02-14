@@ -2,27 +2,31 @@ part of 'home_bloc.dart';
 
 class HomeState extends Equatable {
   final bool isRefreshing;
-  final List<Product> productList;
+  List<Product> productList;
   final homeState? homestate;
+  final String? errorMessage;
 
-  const HomeState({
+  HomeState({
     required this.isRefreshing,
     required this.productList,
     this.homestate,
+    this.errorMessage,
   });
 
   factory HomeState.initial() =>
-      const HomeState(isRefreshing: false, productList: []);
+      HomeState(isRefreshing: false, productList: []);
 
   HomeState copyWith({
     bool? isRefreshing,
     List<Product>? productList,
     homeState? homestate,
+    String? errorMessage,
   }) =>
       HomeState(
         isRefreshing: isRefreshing ?? this.isRefreshing,
         productList: productList ?? this.productList,
         homestate: homestate ?? this.homestate,
+        errorMessage: errorMessage ?? this.errorMessage,
       );
 
   @override
@@ -37,4 +41,7 @@ enum homeState {
   ok,
   loading,
   failureLoadiing,
+  emptySearch,
+  okSearch,
+  loadingSearch
 }

@@ -12,12 +12,13 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
-        id: json["item_id"],
+        id: json["item_id"] as int,
         mainPhoto: json["main_photo_src"],
         label: json["name"],
-        price: json["price"],
+        price: json["price"].toDouble(),
       );
 }
 
+bool hasMore = true;
 int itemCounter = 0;
 List<Product> productList = [];

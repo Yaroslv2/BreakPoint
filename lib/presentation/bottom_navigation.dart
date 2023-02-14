@@ -12,10 +12,10 @@ class BottomBar extends StatefulWidget {
 class _BottomBarState extends State<BottomBar> {
   int _currentIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
+  static final List<Widget> _pages = <Widget>[
     HomePage(),
-    ShoppingCartPage(),
-    AccountPage()
+    const ShoppingCartPage(),
+    const AccountPage(),
   ];
 
   void _onTap(index) {

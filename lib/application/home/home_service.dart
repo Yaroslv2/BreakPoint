@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:brandpoint/application/home/product_list.dart';
+import 'package:brandpoint/models/product_list.dart';
 import 'package:brandpoint/models/response.dart';
 import 'package:dio/dio.dart';
 
@@ -13,7 +13,7 @@ class HomeService {
   Future<MyResponse> getProductList(String request) async {
     var params = {
       "request_string": request,
-      "item_counter": 0,
+      "item_counter": itemCounter,
     };
     var response;
     try {
@@ -27,25 +27,28 @@ class HomeService {
         ),
         data: json.encode(params),
       );
-      //print(response.data);
       if (response.statusCode == 200) {
         if (response.data["error"] != null) {
           print("error response");
           return MyResponse.withError(response.data["error"], 0);
         } else {
           itemCounter += response.data["item_counter"] as int;
-          final itemList =
-              response.data["items"].map((i) => Product.fromJson(i)).toList();
+          List<Product>? itemList = List<Product>.from(
+              response.data["items"].map((i) => Product.fromJson(i)));
+          if (itemList.isEmpty) {
+            hasMore = false;
+          }
+          productList.addAll(itemList);
 
-          return MyResponse(itemList, response.statusCode);
+          return MyResponse(productList, response.statusCode);
         }
       } else {
         print("error statusCode");
         return MyResponse.withError("errorValue", response.statusCode);
       }
     } catch (e) {
-      print("error catch");
-      return MyResponse.withError(e.toString(), response.statusCode);
+      print("$e");
+      return MyResponse.withError(e.toString(), 0);
     }
   }
 }
